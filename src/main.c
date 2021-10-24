@@ -83,6 +83,7 @@ int	main(int argc, char *argv[])
 		write(STDERR_FILENO, "ERROR: Invalid arguments\n", 25);
 		return(EXIT_FAILURE);
 	}
+	// i forgot the commit msg
 	exec_cmd(argv[1]);
 	return (0);
 }
