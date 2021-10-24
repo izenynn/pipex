@@ -10,6 +10,15 @@
 #                                                                              #
 # **************************************************************************** #
 
+# COLORS
+NOCOL=\033[0m
+RED=\033[1;31m
+YEL=\033[1;33m
+ORG=\033[0;33m
+GRN=\033[1;32m
+DGRAY=\033[1;30m
+BLU=\033[1;34m
+
 # NAMES
 NAME = pipex
 
@@ -24,8 +33,8 @@ SRC_PATH = src
 OBJ_PATH = obj
 
 # SOURCES
-SRC_FILES = main.c #utils.c
-SRCB_FILES = bonus.c #utils.c
+SRC_FILES = main.c utils.c
+SRCB_FILES = bonus.c utils.c
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_FILES))
 SRCB = $(addprefix $(SRC_PATH)/, $(SRCB_FILES))
@@ -61,7 +70,6 @@ fclean: clean
 re: fclean all
 
 norm:
-	@clear
-	@echo ""
-	@echo "########## NORMINETTE ##########"
-	@norminette .
+	@printf "\n${GRN}##########${YEL} NORMINETTE ${GRN}##########${NOCOL}\n"
+	@printf "\n${GRN}SRC:${BLU}\n\n"
+	@norminette $(SRC_PATH)
