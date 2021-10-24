@@ -12,17 +12,13 @@
 
 #include <stdio.h>
 
-int	main(int argc, char *argv[], char *envp[])
+int	main(int argc, char *argv[])
 {
 	extern char	**environ;
 
 	printf("ENVIRON:\n");
 	for (int i = 0; environ[i]; i++)
 		printf("env: %s\n", environ[i]);
-
-	printf("ENVP:\n");
-	for (int i = 0; envp[i]; i++)
-		printf("env: %s\n", envp[i]);
 
 	// silence warnings :)
 	if (argv[0] || argc)
