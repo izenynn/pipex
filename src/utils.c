@@ -52,25 +52,6 @@ char	*ft_strdup(const char *s1)
 	return (save);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*save;
-	char	*out;
-
-	if (!s1 || !s2)
-		return (NULL);
-	out = malloc(ft_strlen(s1) + ft_strlen(s2) + 1);
-	if (!out)
-		return (NULL);
-	save = out;
-	while (*s1)
-		*out++ = *s1++;
-	while (*s2)
-		*out++ = *s2++;
-	*out = '\0';
-	return (save);
-}
-
 char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
 	size_t	out_len;
@@ -106,4 +87,34 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 		return ((unsigned char)s1[i] - (unsigned char)s2[i]);
 	else
 		return (0);
+}
+
+char	*dir_join(char const *dir1, char const *dir2)
+{
+	char	*save;
+	char	*out;
+
+	if (!dir1 || !dir2)
+		return (NULL);
+	out = malloc(ft_strlen(dir1) + ft_strlen(dir2) + 2);
+	if (!out)
+		return (NULL);
+	save = out;
+	while (*dir1)
+		*out++ = *dir1++;
+	*out++ = '/';
+	while (*dir2)
+		*out++ = *dir2++;
+	*out = '\0';
+	return (save);
+}
+
+void	free_split(char **split)
+{
+	int	i;
+
+	i = -1;
+	while (split[++i])
+		free(split[i]);
+	free(split);
 }

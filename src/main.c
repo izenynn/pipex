@@ -16,50 +16,64 @@
 #include <fcntl.h>
 
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
-char	*ft_strchr(const char *s, int c);
+size_t	ft_strlen(const char *s);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s1);
-char	*ft_strjoin(char const *s1, char const *s2);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
+char	*dir_join(char const *dir, char const *dir2);
+char	**ft_split(const char *s, char c);
+void	free_split(char **split);
 
-/*static char	*get_path(char *cmd, const char *path)
+static char	*get_path(char *cmd, const char *path)
 {
 	char		*file;
 	char		*dir;
-	int			i;
+	int			diff;
 
-	while (path)
+	while (*path)
 	{
-		dir = ft_substr(path, 0, (size_t)(path - ft_strchr(path, ':')));
-		file = ft_strjoin(dir, cmd);
+		diff = ft_strchr(path, ':') - path;
+		if (diff < 0)
+			diff = ft_strlen(path);
+		dir = ft_substr(path, 0, diff);
+		file = dir_join(dir, cmd);
 		free(dir);
 		if (access(file, X_OK) == 0)
 			return (file);
 		free(file);
-		path += path - ft_strchr(path, ':');
+		path += diff;
+		if (*path)
+			path++;
 	}
 	return (cmd);
-}*/
+}
 
 static void	exec_cmd(char *cmd)
 {
 	extern char	**environ;
 	char		*path;
+	char		*cmd_path;
+	char		**args;
 	int			i;
 
 	i = 0;
 	while (environ[i] && ft_strncmp(environ[i], "PATH=", 5))
 		i++;
 	path = ft_strdup(environ[i] + 5);
-	// TODO exec command
-	printf("PATH:\n%s\n", path);
-	//printf("CMD PATH:\n%s\n", get_path(cmd, path));
-
-	// silence warnings :D
-	if (cmd)
-		printf("-_-\n");
-
+	if (!path)
+		return ;
+	args = ft_split(cmd, ' ');
+	if (*args[0] == '/' || *args[0] == '.' || *args[0] == '~')
+		cmd_path = args[0];
+	else
+	{	
+		cmd_path = get_path(args[0], path);
+	}
 	free(path);
+	execve(cmd_path, args, environ);
+	// ERROR
+	printf("Error\n");
+	free_split(args);
 }
 
 int	main(int argc, char *argv[])
@@ -69,7 +83,6 @@ int	main(int argc, char *argv[])
 		write(STDERR_FILENO, "ERROR: Invalid arguments\n", 25);
 		return(EXIT_FAILURE);
 	}
-	printf("CMD:\n%s\n", argv[1]);
 	exec_cmd(argv[1]);
 	return (0);
 }

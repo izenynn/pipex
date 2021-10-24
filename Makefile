@@ -33,7 +33,7 @@ SRC_PATH = src
 OBJ_PATH = obj
 
 # SOURCES
-SRC_FILES = main.c utils.c
+SRC_FILES = main.c utils.c ft_split.c
 SRCB_FILES = bonus.c utils.c
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_FILES))
