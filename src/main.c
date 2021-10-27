@@ -14,9 +14,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 size_t	ft_strlen(const char *s);
+void	err_exit(const char *err, const char *msg);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s1);
 char	*ft_substr(char const *s, unsigned int start, size_t len);
@@ -61,7 +63,7 @@ static void	exec_cmd(char *cmd)
 		i++;
 	path = ft_strdup(environ[i] + 5);
 	if (!path)
-		return ;
+		err_exit("Error", "path not found");
 	args = ft_split(cmd, ' ');
 	if (*args[0] == '/' || *args[0] == '.' || *args[0] == '~')
 		cmd_path = args[0];
@@ -71,8 +73,7 @@ static void	exec_cmd(char *cmd)
 	}
 	free(path);
 	execve(cmd_path, args, environ);
-	// ERROR
-	printf("Error\n");
+	err_exit("Error", "execve returned error");
 	free_split(args);
 }
 
@@ -83,7 +84,6 @@ int	main(int argc, char *argv[])
 		write(STDERR_FILENO, "ERROR: Invalid arguments\n", 25);
 		return(EXIT_FAILURE);
 	}
-	// i forgot the commit msg
 	exec_cmd(argv[1]);
 	return (0);
 }
