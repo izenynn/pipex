@@ -30,14 +30,6 @@ void	die(const char *msg)
 	exit(EXIT_FAILURE);
 }
 
-void	err_exit(const char *err, const char *msg)
-{
-	write(STDERR_FILENO, err, ft_strlen(err));
-	write(STDERR_FILENO, ": ", 2);
-	write(STDERR_FILENO, msg, ft_strlen(msg));
-	write(STDERR_FILENO, "\n", 1);
-}
-
 char	*ft_strchr(const char *s, int c)
 {
 	if (c == '\0')
