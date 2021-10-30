@@ -14,8 +14,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
-#include <errno.h>
 
+/* file i/o */
+#define F_INPUT 0
+#define F_OUTPUT 1
+
+/* pipe ends */
+#define READ_END 0
+#define WRITE_END 1
+
+void	die(const char *msg);
 int		ft_strncmp(const char *s1, const char *s2, size_t n);
 size_t	ft_strlen(const char *s);
 void	err_exit(const char *err, const char *msg);
@@ -73,17 +81,68 @@ static void	exec_cmd(char *cmd)
 	}
 	free(path);
 	execve(cmd_path, args, environ);
-	err_exit("Error", "execve returned error");
+	perror("execve");
 	free_split(args);
+	exit(EXIT_FAILURE);
 }
+
+static void redir(char *cmd)
+{
+	int fd[2];
+	pid_t pid;
+
+	if (pipe(fd) == -1)
+		die("pipe");
+	pid = fork();
+	/* check if fork failed */
+	if (pid < 0)
+		die("fork");
+	/* parent process */
+	if (pid > 0)
+	{
+		close(fd[WRITE_END]);
+		dup2(fd[READ_END], STDIN_FILENO);
+		close(fd[READ_END]);
+		waitpid(pid, NULL, 0);
+	}
+	/* child will write the output of the command */
+	else
+	{
+		close(fd[READ_END]);
+		dup2(fd[WRITE_END], STDOUT_FILENO);
+		close(fd[WRITE_END]);
+		exec_cmd(cmd);
+	}
+}
+
+/*void leaks()
+{
+	system("leaks -q pipex");
+}*/
 
 int	main(int argc, char *argv[])
 {
-	if (argc < 2)
+	int	i;
+	int	fd_io[2];
+
+	//atexit(leaks);
+	if (argc < 5)
 	{
 		write(STDERR_FILENO, "ERROR: Invalid arguments\n", 25);
 		return(EXIT_FAILURE);
 	}
-	exec_cmd(argv[1]);
+	fd_io[F_INPUT] = open(argv[1], O_RDONLY);
+	fd_io[F_OUTPUT] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (fd_io[0] == -1 || fd_io[1] == -1)
+	{
+		perror("open");
+		return (EXIT_FAILURE);
+	}
+	dup2(fd_io[F_INPUT], STDIN_FILENO);
+	dup2(fd_io[F_OUTPUT], STDOUT_FILENO);
+	i = 1;
+	while (++i < argc)
+		redir(argv[i]);
+	exec_cmd(argv[3]);
 	return (0);
 }

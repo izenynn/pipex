@@ -12,6 +12,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include <stdio.h>
 
 size_t	ft_strlen(const char *s)
 {
@@ -21,6 +22,12 @@ size_t	ft_strlen(const char *s)
 	while (s[cnt])
 		cnt++;
 	return (cnt);
+}
+
+void	die(const char *msg)
+{
+	perror(msg);
+	exit(EXIT_FAILURE);
 }
 
 void	err_exit(const char *err, const char *msg)

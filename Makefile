@@ -26,7 +26,8 @@ NAME = pipex
 CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror
-CFLAGS += -fsanitize=address -g3
+CFLAGS += -fsanitize=address
+CFLAGS += -g3
 
 # PATHS
 SRC_PATH = src
@@ -72,4 +73,5 @@ re: fclean all
 norm:
 	@printf "\n${GRN}##########${YEL} NORMINETTE ${GRN}##########${NOCOL}\n"
 	@printf "\n${GRN}SRC:${BLU}\n\n"
+	@printf "${NOCOL}"
 	@norminette $(SRC_PATH)
