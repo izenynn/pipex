@@ -33,6 +33,8 @@ NAME = pipex
 #                                   COMPILER                                   #
 # **************************************************************************** #
 
+MAKE = make
+
 CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror
@@ -41,17 +43,7 @@ CFLAGS = -Wall -Wextra -Werror
 #                                    FLAGS                                     #
 # **************************************************************************** #
 
-CFLAGS += -I inc
-
-# **************************************************************************** #
-#                                     LIBS                                     #
-# **************************************************************************** #
-
-CFLAGS += -I $(LFT_DIR)/inc
-
-LDFLAGS = -L $(LFT_DIR)
-
-LDLIBS = -lft
+CFLAGS += -I ./inc
 
 # **************************************************************************** #
 #                                    PATHS                                     #
@@ -59,22 +51,33 @@ LDLIBS = -lft
 
 SRC_PATH = src
 OBJ_PATH = obj
+INC_PATH = inc
+
+# **************************************************************************** #
+#                                     LIBS                                     #
+# **************************************************************************** #
+
+LFT_NAME = libft.a
+LFT_DIR = libft
+LFT = $(LFT_DIR)/$(LFT_NAME)
+
+CFLAGS += -I ./$(LFT_DIR)/$(INC_PATH)
+
+LDFLAGS = -L ./$(LFT_DIR)
+
+LDLIBS = -lft
 
 # **************************************************************************** #
 #                                   SOURCES                                    #
 # **************************************************************************** #
 
 SRC_FILES = main.c utils.c ft_split.c
-SRCB_FILES = bonus.c utils.c
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_FILES))
-SRCB = $(addprefix $(SRC_PATH)/, $(SRCB_FILES))
 
 OBJ_FILES = $(SRC_FILES:%.c=%.o)
-OBJB_FILES = $(SRCB_FILES:%.c=%.o)
 
 OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_FILES))
-OBJB = $(addprefix $(OBJ_PATH)/, $(OBJB_FILES))
 
 # **************************************************************************** #
 #                                ONLY DEV FLAGS                                #
@@ -104,15 +107,16 @@ endif
 #                                    RULES                                     #
 # **************************************************************************** #
 
-.PHONY: all bonus clean fclean re norm
+.PHONY: all clean fclean re norm setup
 
 all: $(NAME) $(CHECKER_NAME)
 
-$(NAME): $(OBJ)
-	$(CC) $^ -o $@ $(CFLAGS)
+$(NAME): $(LFT_NAME) $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-bonus: $(OBJB)
-	$(CC) $^ -o $(NAME) $(CFLAGS)
+$(LFT_NAME):
+	$(MAKE) all -sC $(LFT_DIR)
+	cp $(LFT) $(LFT_NAME)
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -121,6 +125,8 @@ $(OBJ_PATH):
 	mkdir -p $(OBJ_PATH) 2> /dev/null
 
 clean:
+	$(MAKE) fclean -sC $(LFT_DIR)
+	rm -rf $(LFT_NAME)
 	rm -rf $(OBJ_PATH)
 
 fclean: clean
@@ -130,6 +136,8 @@ re: fclean all
 
 norm:
 	@printf "\n${GRN}##########${YEL} NORMINETTE ${GRN}##########${NOCOL}\n"
-	@printf "\n${GRN}SRC:${BLU}\n\n"
-	@printf "${NOCOL}"
+	@printf "\n${GRN}LIBFT:${BLU}\n\n"
+	@norminette $(LFT_DIR)
+	@printf "\n${GRN}PIPEX:${BLU}\n\n"
 	@norminette $(SRC_PATH)
+	@printf "${NOCOL}"

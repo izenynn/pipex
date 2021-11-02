@@ -10,10 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <libft.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
@@ -26,14 +28,8 @@
 #define WRITE_END 1
 
 void	die(const char *msg);
-int		ft_strncmp(const char *s1, const char *s2, size_t n);
-size_t	ft_strlen(const char *s);
 void	err_exit(const char *err, const char *msg);
-char	*ft_strchr(const char *s, int c);
-char	*ft_strdup(const char *s1);
-char	*ft_substr(char const *s, unsigned int start, size_t len);
 char	*dir_join(char const *dir, char const *dir2);
-char	**ft_split(const char *s, char c);
 void	free_split(char **split);
 
 static char	*get_path(char *cmd, const char *path)
@@ -73,10 +69,7 @@ static void	exec_cmd(char *cmd)
 		i++;
 	path = ft_strdup(environ[i] + 5);
 	if (!path)
-	{
-		write(STDERR_FILENO, "Error: path not found\n", 22);
-		exit(EXIT_FAILURE);
-	}
+		err_exit("Error", "path not found");
 	args = ft_split(cmd, ' ');
 	if (*args[0] == '/' || *args[0] == '.' || *args[0] == '~')
 		cmd_path = args[0];
@@ -95,11 +88,11 @@ static void redir(char *cmd)
 	pid_t pid;
 
 	if (pipe(fd) == -1)
-		die("pipe");
+		err_exit("pipe", errno);
 	pid = fork();
 	/* check if fork failed */
 	if (pid < 0)
-		die("fork");
+		err_exit("pipe", errno);
 	/* parent process */
 	if (pid > 0)
 	{
