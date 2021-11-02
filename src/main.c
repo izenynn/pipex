@@ -10,27 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <pipex.h>
 #include <libft.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-
-/* file i/o */
-#define F_INPUT 0
-#define F_OUTPUT 1
-
-/* pipe ends */
-#define READ_END 0
-#define WRITE_END 1
-
-void	die(const char *msg);
-void	err_exit(const char *err, const char *msg);
-char	*dir_join(char const *dir, char const *dir2);
-void	free_split(char **split);
 
 static char	*get_path(char *cmd, const char *path)
 {
@@ -92,7 +73,7 @@ static void redir(char *cmd)
 	pid = fork();
 	/* check if fork failed */
 	if (pid < 0)
-		err_exit("pipe", errno);
+		err_exit("fork", errno);
 	/* parent process */
 	if (pid > 0)
 	{
@@ -122,9 +103,11 @@ int	main(int argc, char *argv[])
 	int	fd_io[2];
 
 	//atexit(leaks);
-	if (argc < 5)
+	if (argc < 5 || (!ft_strncmp(argv[1], "here_doc", 9) && argc < 6))
 	{
-		write(STDERR_FILENO, "ERROR: Invalid arguments\n", 25);
+		ft_dprintf(STDERR_FILENO, "ERROR: Invalid arguments, usage:\n");
+		ft_dprintf(STDERR_FILENO, "./pipex [in file] [cmd 1] [cmd 2] [...] [out file]\n");
+		ft_dprintf(STDERR_FILENO, "./pipex here_doc [DELIMITER] [cmd 1] [cmd 2] [...] [out file]\n");
 		return(EXIT_FAILURE);
 	}
 	fd_io[F_INPUT] = open(argv[1], O_RDONLY);
