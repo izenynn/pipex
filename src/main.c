@@ -13,6 +13,17 @@
 #include <pipex.h>
 #include <libft.h>
 
+/* open file and handle errors */
+static int	open_f(char *file, int oflag)
+{
+	int	fd;
+
+	fd = open(file, oflag, 0644);
+	if (fd == -1)
+		die(file);
+	return (fd);
+}
+
 /* find command in path */
 static char	*get_path(char *cmd, const char *path)
 {

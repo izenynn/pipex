@@ -52,15 +52,29 @@ void	free_split(char **split)
 	free(split);
 }
 
-/* open file and handle errors */
-int	open_f(char *file, int oflag)
+/* handle here document read until delim */
+static void	handle_read_hd(char *argv, int fd[2])
 {
-	int	fd;
+	char	*line;
+	char	*delim;
 
-	fd = open(file, oflag, 0644);
-	if (fd == -1)
-		die(file);
-	return (fd);
+	delim = ft_strjoin(argv, "\n");
+	close(fd[READ_END]);
+	line = ft_get_next_line(STDIN_FILENO);
+	while (line)
+	{
+		if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
+		{
+			free(line);
+			free(delim);
+			exit(EXIT_SUCCESS);
+		}
+		ft_putstr_fd(line, fd[WRITE_END]);
+		free(line);
+		line = ft_get_next_line(STDIN_FILENO);
+	}
+	free(line);
+	free(delim);
 }
 
 /* handle here document "<<" */
@@ -85,22 +99,6 @@ void	handle_here_doc(char *argv)
 	}
 	else
 	{
-		delim = ft_strjoin(argv, "\n");
-		close(fd[READ_END]);
-		line = ft_get_next_line(STDIN_FILENO);
-		while (line)
-		{
-			if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
-			{
-				free(line);
-				free(delim);
-				exit(EXIT_SUCCESS);
-			}
-			ft_putstr_fd(line, fd[WRITE_END]);
-			free(line);
-			line = ft_get_next_line(STDIN_FILENO);
-		}
-		free(line);
-		free(delim);
+		handle_read_hd(argv, fd);
 	}
 }

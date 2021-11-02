@@ -34,7 +34,6 @@
 void	die(const char *s);
 char	*dir_join(char const *dir, char const *dir2);
 void	free_split(char **split);
-int		open_f(char *file, int oflag);
 void	handle_here_doc(char *delim);
 
 #endif
