@@ -71,7 +71,6 @@ void	handle_here_doc(char *argv)
 	pid = fork();
 	if (pid < 0)
 		die("fork");
-	/* parent */
 	if (pid > 0)
 	{
 		close(fd[WRITE_END]);
@@ -79,7 +78,6 @@ void	handle_here_doc(char *argv)
 		close(fd[READ_END]);
 		waitpid(pid, NULL, 0);
 	}
-	/* child */
 	else
 	{
 		delim = ft_strjoin(argv, "\n");
@@ -88,11 +86,16 @@ void	handle_here_doc(char *argv)
 		while (line)
 		{
 			if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
+			{
+				free(line);
+				free(delim);
 				exit(EXIT_SUCCESS);
+			}
 			ft_putstr_fd(line, fd[WRITE_END]);
 			free(line);
 			line = ft_get_next_line(STDIN_FILENO);
 		}
 		free(line);
+		free(delim);
 	}
 }

@@ -67,16 +67,14 @@ static void	exec_cmd(char *cmd)
 
 static void	redir(char *cmd)
 {
-	int fd[2];
-	pid_t pid;
+	int		fd[2];
+	pid_t	pid;
 
 	if (pipe(fd) == -1)
 		die("pipe");
 	pid = fork();
-	/* check if fork failed */
 	if (pid < 0)
 		die("fork");
-	/* parent process */
 	if (pid > 0)
 	{
 		close(fd[WRITE_END]);
@@ -84,7 +82,6 @@ static void	redir(char *cmd)
 		close(fd[READ_END]);
 		waitpid(pid, NULL, 0);
 	}
-	/* child will write the output of the command */
 	else
 	{
 		close(fd[READ_END]);
@@ -104,7 +101,6 @@ int	main(int argc, char *argv[])
 	int	i;
 	int	fd_io[2];
 
-	//atexit(leaks);
 	if (argc >= 6 && !ft_strncmp(argv[1], "here_doc", 9))
 	{
 		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
@@ -113,14 +109,8 @@ int	main(int argc, char *argv[])
 	}
 	else if (argc >= 5)
 	{
-		fd_io[F_IP] = open_file(argv[1], O_RDONLY);
 		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
-
-		if (fd_io[F_IP] == -1)
-			die(argv[1]);
-		else if (fd_io[F_OP] == -1)
-			die(argv[argc - 1]);
-
+		fd_io[F_IP] = open_file(argv[1], O_RDONLY);
 		dup2(fd_io[F_IP], STDIN_FILENO);
 		i = 1;
 	}
