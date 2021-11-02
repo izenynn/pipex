@@ -14,8 +14,8 @@
 # define PIPEX_H
 
 /* file i/o */
-# define F_INPUT 0
-# define F_OUTPUT 1
+# define F_IP 0
+# define F_OP 1
 
 /* pipe ends */
 # define READ_END 0
@@ -31,9 +31,10 @@
 # include <sys/wait.h>
 
 /* utils.c */
-void	err_exit(const char *msg, const char *err);
+void	die(const char *s);
 char	*dir_join(char const *dir, char const *dir2);
 void	free_split(char **split);
-void	handle_here_doc(int argc, char)
+int		open_file(char *file, int oflag);
+void	handle_here_doc(char *delim);
 
 #endif

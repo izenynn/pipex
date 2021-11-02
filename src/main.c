@@ -50,7 +50,10 @@ static void	exec_cmd(char *cmd)
 		i++;
 	path = ft_strdup(environ[i] + 5);
 	if (!path)
-		err_exit("Error", "path not found");
+	{
+		ft_putstr_fd("Error: path not found", STDERR_FILENO);
+		exit(EXIT_FAILURE);
+	}
 	args = ft_split(cmd, ' ');
 	if (*args[0] == '/' || *args[0] == '.' || *args[0] == '~')
 		cmd_path = args[0];
@@ -58,22 +61,21 @@ static void	exec_cmd(char *cmd)
 		cmd_path = get_path(args[0], path);
 	free(path);
 	execve(cmd_path, args, environ);
-	perror(cmd_path);
 	free_split(args);
-	exit(EXIT_FAILURE);
+	die(cmd_path);
 }
 
-static void redir(char *cmd)
+static void	redir(char *cmd)
 {
 	int fd[2];
 	pid_t pid;
 
 	if (pipe(fd) == -1)
-		err_exit("pipe", errno);
+		die("pipe");
 	pid = fork();
 	/* check if fork failed */
 	if (pid < 0)
-		err_exit("fork", errno);
+		die("fork");
 	/* parent process */
 	if (pid > 0)
 	{
@@ -103,26 +105,33 @@ int	main(int argc, char *argv[])
 	int	fd_io[2];
 
 	//atexit(leaks);
-	if (argc < 5 || (!ft_strncmp(argv[1], "here_doc", 9) && argc < 6))
+	if (argc >= 6 && !ft_strncmp(argv[1], "here_doc", 9))
 	{
-		ft_dprintf(STDERR_FILENO, "ERROR: Invalid arguments, usage:\n");
-		ft_dprintf(STDERR_FILENO, "./pipex [in file] [cmd 1] [cmd 2] [...] [out file]\n");
-		ft_dprintf(STDERR_FILENO, "./pipex here_doc [DELIMITER] [cmd 1] [cmd 2] [...] [out file]\n");
-		return(EXIT_FAILURE);
+		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
+		handle_here_doc(argv[2]);
+		i = 2;
 	}
-	fd_io[F_INPUT] = open(argv[1], O_RDONLY);
-	fd_io[F_OUTPUT] = open(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd_io[F_INPUT] == -1)
-		perror(argv[1]);
-	else if (fd_io[F_OUTPUT] == -1)
-		perror(argv[argc - 1]);
-	if (fd_io[0] == -1 || fd_io[F_OUTPUT] == -1)
-		return (EXIT_FAILURE);
-	dup2(fd_io[F_INPUT], STDIN_FILENO);
-	dup2(fd_io[F_OUTPUT], STDOUT_FILENO);
-	i = 1;
+	else if (argc >= 5)
+	{
+		fd_io[F_IP] = open_file(argv[1], O_RDONLY);
+		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
+
+		if (fd_io[F_IP] == -1)
+			die(argv[1]);
+		else if (fd_io[F_OP] == -1)
+			die(argv[argc - 1]);
+
+		dup2(fd_io[F_IP], STDIN_FILENO);
+		i = 1;
+	}
+	else
+	{
+		ft_putstr_fd("Error: invalid arguments", STDERR_FILENO);
+		exit(EXIT_FAILURE);
+	}
 	while (++i < argc - 2)
 		redir(argv[i]);
+	dup2(fd_io[F_OP], STDOUT_FILENO);
 	exec_cmd(argv[i]);
 	return (0);
 }

@@ -13,9 +13,9 @@
 #include <pipex.h>
 #include <libft.h>
 
-void	err_exit(const char *msg, const char *err)
+void	die(const char *s)
 {
-	ft_dprintf(1, "%s: %s\n", msg, err);
+	perror(s);
 	exit(EXIT_FAILURE);
 }
 
@@ -49,35 +49,47 @@ void	free_split(char **split)
 	free(split);
 }
 
-void	handle_here_doc(int argc, char *delim)
+int	open_file(char *file, int oflag)
+{
+	int	fd;
+
+	fd = open(file, oflag, 0644);
+	if (fd == -1)
+		die(file);
+	return (fd);
+}
+
+void	handle_here_doc(char *argv)
 {
 	int		fd[2];
 	pid_t	pid;
 	char	*line;
+	char	*delim;
 
 	if (pipe(fd) == -1)
-		err_exit("pipe", errno);
+		die("pipe");
 	pid = fork();
 	if (pid < 0)
-		err_exit("fork", errno);
+		die("fork");
 	/* parent */
 	if (pid > 0)
 	{
-		close(fd[READ_END]);
-		dup2(fd[WRITE_END], STDIN_FILENO);
 		close(fd[WRITE_END]);
+		dup2(fd[READ_END], STDIN_FILENO);
+		close(fd[READ_END]);
 		waitpid(pid, NULL, 0);
 	}
 	/* child */
 	else
 	{
+		delim = ft_strjoin(argv, "\n");
 		close(fd[READ_END]);
 		line = ft_get_next_line(STDIN_FILENO);
 		while (line)
 		{
 			if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
 				exit(EXIT_SUCCESS);
-			ft_putstr_fd(fd[WRITE_END], line);
+			ft_putstr_fd(line, fd[WRITE_END]);
 			free(line);
 			line = ft_get_next_line(STDIN_FILENO);
 		}
