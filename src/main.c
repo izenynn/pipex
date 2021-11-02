@@ -14,6 +14,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 /* file i/o */
 #define F_INPUT 0
