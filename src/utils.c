@@ -13,12 +13,14 @@
 #include <pipex.h>
 #include <libft.h>
 
+/* handle errors */
 void	die(const char *s)
 {
 	perror(s);
 	exit(EXIT_FAILURE);
 }
 
+/* like join two strings with a '/' between them */
 char	*dir_join(char const *dir1, char const *dir2)
 {
 	char	*save;
@@ -39,6 +41,7 @@ char	*dir_join(char const *dir1, char const *dir2)
 	return (save);
 }
 
+/* free a **char returned by ft_split */
 void	free_split(char **split)
 {
 	int	i;
@@ -49,7 +52,8 @@ void	free_split(char **split)
 	free(split);
 }
 
-int	open_file(char *file, int oflag)
+/* open file and handle errors */
+int	open_f(char *file, int oflag)
 {
 	int	fd;
 
@@ -59,6 +63,7 @@ int	open_file(char *file, int oflag)
 	return (fd);
 }
 
+/* handle here document "<<" */
 void	handle_here_doc(char *argv)
 {
 	int		fd[2];

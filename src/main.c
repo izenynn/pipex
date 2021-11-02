@@ -13,6 +13,7 @@
 #include <pipex.h>
 #include <libft.h>
 
+/* find command in path */
 static char	*get_path(char *cmd, const char *path)
 {
 	char		*file;
@@ -37,6 +38,7 @@ static char	*get_path(char *cmd, const char *path)
 	return (cmd);
 }
 
+/* execute a command */
 static void	exec_cmd(char *cmd)
 {
 	extern char	**environ;
@@ -65,6 +67,7 @@ static void	exec_cmd(char *cmd)
 	die(cmd_path);
 }
 
+/* redirection intput and output with pipe() */
 static void	redir(char *cmd)
 {
 	int		fd[2];
@@ -96,32 +99,32 @@ static void	redir(char *cmd)
 	system("leaks -q pipex");
 }*/
 
+/* main */
 int	main(int argc, char *argv[])
 {
 	int	i;
 	int	fd_io[2];
 
-	if (argc >= 6 && !ft_strncmp(argv[1], "here_doc", 9))
+	if (argc >= 5 || (argc >= 6 && !ft_strncmp(argv[1], "here_doc", 9)))
 	{
-		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
-		handle_here_doc(argv[2]);
-		i = 2;
+		if (!ft_strncmp(argv[1], "here_doc", 9))
+		{
+			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
+			handle_here_doc(argv[2]);
+			i = 2;
+		}
+		else
+		{
+			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
+			fd_io[F_IP] = open_f(argv[1], O_RDONLY);
+			dup2(fd_io[F_IP], STDIN_FILENO);
+			i = 1;
+		}
+		while (++i < argc - 2)
+			redir(argv[i]);
+		dup2(fd_io[F_OP], STDOUT_FILENO);
+		exec_cmd(argv[i]);
 	}
-	else if (argc >= 5)
-	{
-		fd_io[F_OP] = open_file(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
-		fd_io[F_IP] = open_file(argv[1], O_RDONLY);
-		dup2(fd_io[F_IP], STDIN_FILENO);
-		i = 1;
-	}
-	else
-	{
-		ft_putstr_fd("Error: invalid arguments", STDERR_FILENO);
-		exit(EXIT_FAILURE);
-	}
-	while (++i < argc - 2)
-		redir(argv[i]);
-	dup2(fd_io[F_OP], STDOUT_FILENO);
-	exec_cmd(argv[i]);
-	return (0);
+	ft_putstr_fd("Error: invalid arguments", STDERR_FILENO);
+	return (EXIT_FAILURE);
 }
