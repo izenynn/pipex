@@ -20,7 +20,7 @@ void	die(const char *s)
 	exit(EXIT_FAILURE);
 }
 
-/* like join two strings with a '/' between them */
+/* join two strings with a '/' between them */
 char	*dir_join(char const *dir1, char const *dir2)
 {
 	char	*save;
