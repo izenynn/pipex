@@ -82,8 +82,6 @@ void	handle_here_doc(char *argv)
 {
 	int		fd[2];
 	pid_t	pid;
-	char	*line;
-	char	*delim;
 
 	if (pipe(fd) == -1)
 		die("pipe");

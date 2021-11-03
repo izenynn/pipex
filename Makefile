@@ -71,7 +71,7 @@ LDLIBS = -lft
 #                                   SOURCES                                    #
 # **************************************************************************** #
 
-SRC_FILES = main.c utils.c ft_split.c
+SRC_FILES = main.c utils.c
 
 SRC = $(addprefix $(SRC_PATH)/, $(SRC_FILES))
 

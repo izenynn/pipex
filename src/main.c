@@ -53,26 +53,25 @@ static char	*get_path(char *cmd, const char *path)
 static void	exec_cmd(char *cmd)
 {
 	extern char	**environ;
-	char		*path;
 	char		*cmd_path;
 	char		**args;
 	int			i;
 
-	i = 0;
-	while (environ[i] && ft_strncmp(environ[i], "PATH=", 5))
-		i++;
-	path = ft_strdup(environ[i] + 5);
-	if (!path)
-	{
-		ft_putstr_fd("Error: path not found", STDERR_FILENO);
-		exit(EXIT_FAILURE);
-	}
 	args = ft_split(cmd, ' ');
 	if (*args[0] == '/' || *args[0] == '.' || *args[0] == '~')
 		cmd_path = args[0];
 	else
-		cmd_path = get_path(args[0], path);
-	free(path);
+	{
+		i = 0;
+		while (environ[i] && ft_strncmp(environ[i], "PATH=", 5))
+			i++;
+		if (!environ[i])
+		{
+			ft_putstr_fd("Error: path not found\n", STDERR_FILENO);
+			exit(EXIT_FAILURE);
+		}
+		cmd_path = get_path(args[0], environ[i] + 5);
+	}
 	execve(cmd_path, args, environ);
 	free_split(args);
 	die(cmd_path);
@@ -83,6 +82,7 @@ static void	redir(char *cmd)
 {
 	int		fd[2];
 	pid_t	pid;
+	int		status;
 
 	if (pipe(fd) == -1)
 		die("pipe");
@@ -94,7 +94,9 @@ static void	redir(char *cmd)
 		close(fd[WRITE_END]);
 		dup2(fd[READ_END], STDIN_FILENO);
 		close(fd[READ_END]);
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, 0);
+		if (WEXITSTATUS(status) == EXIT_FAILURE)
+			exit(EXIT_FAILURE);
 	}
 	else
 	{
@@ -120,14 +122,14 @@ int	main(int argc, char *argv[])
 	{
 		if (!ft_strncmp(argv[1], "here_doc", 9))
 		{
-			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
 			handle_here_doc(argv[2]);
+			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND);
 			i = 2;
 		}
 		else
 		{
-			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
 			fd_io[F_IP] = open_f(argv[1], O_RDONLY);
+			fd_io[F_OP] = open_f(argv[argc - 1], O_WRONLY | O_CREAT | O_TRUNC);
 			dup2(fd_io[F_IP], STDIN_FILENO);
 			i = 1;
 		}
