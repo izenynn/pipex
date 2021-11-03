@@ -47,7 +47,7 @@ Is equivalent to
 Is equivalent to
 
 ```sh
-<< (LIMITER) (command 1) | (command 2) | (...) > (output file)
+<< (LIMITER) (command 1) | (command 2) | (...) >> (output file)
 ```
 
 ##
