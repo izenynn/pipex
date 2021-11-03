@@ -65,6 +65,7 @@ static void	handle_read_hd(char *argv, int fd[2])
 	{
 		if (!ft_strncmp(line, delim, ft_strlen(delim) + 1))
 		{
+			close(WRITE_END);
 			free(line);
 			free(delim);
 			exit(EXIT_SUCCESS);
@@ -73,6 +74,7 @@ static void	handle_read_hd(char *argv, int fd[2])
 		free(line);
 		line = ft_get_next_line(STDIN_FILENO);
 	}
+	close(WRITE_END);
 	free(line);
 	free(delim);
 }

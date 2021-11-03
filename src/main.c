@@ -107,11 +107,6 @@ static void	redir(char *cmd)
 	}
 }
 
-/*void leaks()
-{
-	system("leaks -q pipex");
-}*/
-
 /* main */
 int	main(int argc, char *argv[])
 {

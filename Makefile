@@ -23,6 +23,9 @@ GRN=\033[1;32m
 DGRAY=\033[1;30m
 BLU=\033[1;34m
 
+# OS
+UNAME_S := $(shell uname -s)
+
 # **************************************************************************** #
 #                                   PROGRAM                                    #
 # **************************************************************************** #
@@ -80,60 +83,56 @@ OBJ_FILES = $(SRC_FILES:%.c=%.o)
 OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_FILES))
 
 # **************************************************************************** #
-#                                ONLY DEV FLAGS                                #
-# **************************************************************************** #
-
-DEV ?= 0;
-
-ifeq ($(DEV), 1)
-	# common flags
-	CFLAGS += -Wall -Werror -Wextra
-	CFLAGS += -Wno-unknown-pragmas
-	# check OS
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		CFLAGS += -pedantic
-		CFLAGS += -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=bounds -fsanitize=null
-		CFLAGS += -g3
-	endif
-	ifeq ($(UNAME_S),Darwin)
-		CFLAGS += -pedantic
-		CFLAGS += -fsanitize=address
-		CFLAGS += -g3
-	endif
-endif
-
-# **************************************************************************** #
 #                                    RULES                                     #
 # **************************************************************************** #
 
 .PHONY: all clean fclean re norm
 
+# all
 all: $(NAME) $(CHECKER_NAME)
 
+# name
 $(NAME): $(LFT_NAME) $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-$(LFT_NAME):
-	$(MAKE) all -sC $(LFT_DIR)
-	cp $(LFT) $(LFT_NAME)
+# debug
+ifeq ($(UNAME_S),Linux)
+debug: CFLAGS += -pedantic -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=bounds -fsanitize=null -g3
+endif
+ifeq ($(UNAME_S),Darwin)
+debug: CFLAGS += -pedantic -fsanitize=address -g3
+endif
+debug: $(NAME)
 
+# libft
+$(LFT_NAME): $(LFT)
+	cp $(LFT) $(LFT_NAME)
+$(LFT):
+	$(MAKE) all -sC $(LFT_DIR)
+
+# objs
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c | $(OBJ_PATH)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# obj path
 $(OBJ_PATH):
 	mkdir -p $(OBJ_PATH) 2> /dev/null
 
+# clean
 clean:
-	$(MAKE) fclean -sC $(LFT_DIR)
+	$(MAKE) clean -sC $(LFT_DIR)
 	rm -rf $(LFT_NAME)
 	rm -rf $(OBJ_PATH)
 
+# fclean
 fclean: clean
+	$(MAKE) fclean -sC $(LFT_DIR)
 	rm -rf $(NAME)
 
+# re
 re: fclean all
 
+# norminette
 norm:
 	@printf "\n${GRN}##########${YEL} NORMINETTE ${GRN}##########${NOCOL}\n"
 	@printf "\n${GRN}LIBFT:${BLU}\n\n"
