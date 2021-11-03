@@ -2,7 +2,7 @@
 
 ## Info
 
-42 Cursus - pipex: reproduce the shell's pipe.
+42 Cursus - pipex: reproduce the shell's pipe `|` in combination with and `<`, `>`, `<<` and `>>`.
 
 - Status: pending evaluation
 - Result: n/a
