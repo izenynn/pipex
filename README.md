@@ -2,10 +2,10 @@
 
 ## Info
 
-42 Cursus - pipex: reproduce the shell's pipe `|` in combination with and `<`, `>`, `<<` and `>>`.
+42 Cursus - pipex: reproduce the shell's pipe and redirections (`<`, `>`, `<<` and `>>`).
 
-- Status: pending evaluation
-- Result: n/a
+- Status: finished
+- Result: pending evaluation
 - Observations: (null)
 
 ## Download and compile
