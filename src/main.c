@@ -27,9 +27,9 @@ static int	open_f(char *file, int oflag)
 /* find command in path */
 static char	*get_path(char *cmd, const char *path)
 {
-	char		*file;
-	char		*dir;
-	int			diff;
+	char	*file;
+	char	*dir;
+	int		diff;
 
 	while (*path)
 	{
@@ -42,11 +42,15 @@ static char	*get_path(char *cmd, const char *path)
 		if (access(file, X_OK) == 0)
 			return (file);
 		free(file);
+		if (ft_strlen(path) < (size_t)diff)
+			break ;
 		path += diff;
 		if (*path)
 			path++;
 	}
-	return (cmd);
+	ft_dprintf(STDERR_FILENO, "%s: command not found\n", cmd);
+	exit(EXIT_FAILURE);
+	return (NULL);
 }
 
 /* execute a command */
@@ -73,7 +77,6 @@ static void	exec_cmd(char *cmd)
 		cmd_path = get_path(args[0], environ[i] + 5);
 	}
 	execve(cmd_path, args, environ);
-	free_split(args);
 	die(cmd_path);
 }
 
