@@ -107,7 +107,7 @@ endif
 #                                    RULES                                     #
 # **************************************************************************** #
 
-.PHONY: all clean fclean re norm setup
+.PHONY: all clean fclean re norm
 
 all: $(NAME) $(CHECKER_NAME)
 
