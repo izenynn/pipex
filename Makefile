@@ -6,7 +6,7 @@
 #    By: dpoveda- <me@izenynn.com>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/10/24 19:08:53 by dpoveda-          #+#    #+#              #
-#    Updated: 2021/10/24 19:08:54 by dpoveda-         ###   ########.fr        #
+#    Updated: 2021/11/04 09:57:18 by dpoveda-         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -89,7 +89,7 @@ OBJ = $(addprefix $(OBJ_PATH)/, $(OBJ_FILES))
 .PHONY: all clean fclean re norm
 
 # all
-all: $(NAME) $(CHECKER_NAME)
+all: $(NAME)
 
 # name
 $(NAME): $(LFT_NAME) $(OBJ)
