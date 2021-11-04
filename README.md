@@ -5,7 +5,7 @@
 42 Cursus - pipex: reproduce the shell's pipe and redirections (`<`, `>`, `<<` and `>>`).
 
 - Status: finished
-- Result: pending evaluation
+- Result: 125%
 - Observations: (null)
 
 ## Download and compile
