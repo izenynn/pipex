@@ -116,7 +116,7 @@ int	main(int argc, char *argv[])
 	int	i;
 	int	fd_io[2];
 
-	if (argc >= 5 || (argc >= 6 && !ft_strncmp(argv[1], "here_doc", 9)))
+	if ((argc >= 5 && ft_strncmp(argv[1], "here_doc", 9)) || argc >= 6)
 	{
 		if (!ft_strncmp(argv[1], "here_doc", 9))
 		{
@@ -136,6 +136,6 @@ int	main(int argc, char *argv[])
 		dup2(fd_io[F_OP], STDOUT_FILENO);
 		exec_cmd(argv[i]);
 	}
-	ft_putstr_fd("Error: invalid arguments", STDERR_FILENO);
+	ft_putstr_fd("Error: invalid arguments\n", STDERR_FILENO);
 	return (EXIT_FAILURE);
 }
